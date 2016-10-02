@@ -29,22 +29,27 @@ router.post('/register', (req, res) => {
       console.log(user);
       let userInfo = setUserInfo(user); 
       res.status(200).json({
-          token: 'JWT ' + generateToken(userInfo),
-          user: userInfo
-        });
+        status: 'SUCCESS',
+        token: 'JWT ' + generateToken(userInfo),
+        user: userInfo
+      });
     }); 
   })
 });
 
 router.post('/login', requireLogin, (req, res) => {
-  res.json({
-    status: 'SUCCESS', message: `Hello ${req.user.email}`
+  let userInfo = setUserInfo(req.user); 
+  res.status(200).json({
+    status: 'SUCCESS',
+    token: 'JWT ' + generateToken(userInfo),
+    user: userInfo
   });
 });
 
 router.post('/logout', requireLogin, (req, res) => {
+  // logout should clear the token
   req.logout();
-  res.json({
+  res.status(200).json({
     status: 'SUCCESS'
   });
 });

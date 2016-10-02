@@ -26,13 +26,23 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
+// to have CORS reqests enabled
+app.use(function(req, res, next) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST');
+  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type, Authorization');
+  next();
+});
+
 app.use(passport.initialize());
 passport.use(User.createStrategy());
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-passport.use(new JwtStrategy(
-  {jwtFromRequest: ExtractJwt.fromAuthHeader(), secretOrKey: config.secret}, 
+passport.use(new JwtStrategy({
+    jwtFromRequest: ExtractJwt.fromAuthHeader(), 
+    secretOrKey: config.secret
+  }, 
   function(jwt_payload, done) {
     User.findOne({id: jwt_payload.sub}, function(err, user) {
       if (err)
