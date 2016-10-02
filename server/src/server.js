@@ -6,7 +6,7 @@ import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
 import passport from 'passport';
-import {Strategy} from 'passport-local';
+import passportJWT from 'passport-jwt';
 
 import config from './config/development';
 
@@ -15,8 +15,9 @@ import User from './models/user';
 import imagesRouter from './routes/images';
 import usersRouter from './routes/users';
 
-const localStrategy = Strategy;
 const app = express();
+const ExtractJwt = passportJWT.ExtractJwt;
+const JwtStrategy = passportJWT.Strategy;
 
 mongoose.connect(config.database);
 
@@ -24,11 +25,25 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(passport.initialize());
 
+app.use(passport.initialize());
 passport.use(User.createStrategy());
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
+
+passport.use(new JwtStrategy(
+  {jwtFromRequest: ExtractJwt.fromAuthHeader(), secretOrKey: config.secret}, 
+  function(jwt_payload, done) {
+    User.findOne({id: jwt_payload.sub}, function(err, user) {
+      if (err)
+        return done(err, false);
+      if (user)
+        done(null, user);
+      else
+        done(null, false); 
+      });
+  })
+);
 
 app.use('/api', imagesRouter);
 app.use('/auth', usersRouter);
