@@ -2,8 +2,9 @@ import express from 'express';
 import passport from 'passport';
 import jwt from 'jsonwebtoken';
 
-import config from '../config/development';
 import User from '../models/user';
+const env = process.env.NODE_ENV || 'development';
+const config = require('../config/' + env)
 
 const requireLogin = passport.authenticate('local');
 let router = express.Router();
@@ -26,7 +27,6 @@ router.post('/register', (req, res) => {
     if (err) 
       res.json({error: err})
     requireLogin(req, res, () => {
-      console.log(user);
       let userInfo = setUserInfo(user); 
       res.status(200).json({
         status: 'SUCCESS',

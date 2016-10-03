@@ -8,14 +8,13 @@ import mongoose from 'mongoose';
 import passport from 'passport';
 import passportJWT from 'passport-jwt';
 
-import config from './config/development';
-
 import User from './models/user';
-
 import imagesRouter from './routes/images';
 import usersRouter from './routes/users';
 
 const app = express();
+const env = process.env.NODE_ENV || 'development';
+const config = require('./config/' + env)
 const ExtractJwt = passportJWT.ExtractJwt;
 const JwtStrategy = passportJWT.Strategy;
 
@@ -29,7 +28,7 @@ app.use(cookieParser());
 // to have CORS reqests enabled
 app.use(function(req, res, next) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT');
   res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type, Authorization');
   next();
 });
@@ -46,7 +45,7 @@ passport.use(new JwtStrategy({
   function(jwt_payload, done) {
     User.findOne({id: jwt_payload.sub}, function(err, user) {
       if (err)
-        return done(err, false);
+        return done(err, false); 
       if (user)
         done(null, user);
       else
@@ -57,7 +56,6 @@ passport.use(new JwtStrategy({
 
 app.use('/api', imagesRouter);
 app.use('/auth', usersRouter);
-
 
 app.use(function(req, res, next) {
     var err = new Error('Not Found');
