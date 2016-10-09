@@ -31,17 +31,14 @@ describe('API routes - unauthenticaed user', function(){
 
 describe('API routes - aunthenticated user', function(){
 
-  const testUser = testUserData();
-
   before(function(done){
     User.register(
-      new User({email: testUser.email}), testUser.password, (err, user) => {
+      new User({email: 'test_user@email.com'}), 'password', (err, user) => {
         if (err)
           console.log("An error occured: " + err);
-
         chai.request(app)
         .post('/auth/login')
-        .send(testUser)
+        .send({email: 'test_user@email.com', password: 'password'})
         .end((err, res) => { 
           this.token = res.body.token;
           this.owner = res.body.user._id;
@@ -52,7 +49,6 @@ describe('API routes - aunthenticated user', function(){
   }); 
 
   beforeEach(function(done){
-    console.log('creating new image')
     let image = new Image(validTestImage())
     image.owner = this.owner;
     image.save((err) =>{ 
@@ -72,7 +68,7 @@ describe('API routes - aunthenticated user', function(){
   });
 
   after(function(done){
-    User.remove({}, function(err){
+    User.remove({email: 'test_user@email.com'}, function(err){
       if (err) { console.log(err) } 
       done();
     });

@@ -1,6 +1,4 @@
-import mongoose from 'mongoose';
 import { expect } from 'chai';
-import config from '../src/config/test';
 import Image from '../src/models/image';
 
 import { 
