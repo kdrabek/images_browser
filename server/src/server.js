@@ -39,17 +39,17 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 passport.use(new JwtStrategy({
-    jwtFromRequest: ExtractJwt.fromAuthHeader(), 
+    jwtFromRequest: ExtractJwt.fromAuthHeader(),
     secretOrKey: config.secret
-  }, 
+  },
   function(jwt_payload, done) {
     User.findOne({id: jwt_payload.sub}, function(err, user) {
       if (err)
-        return done(err, false); 
+        return done(err, false);
       if (user)
         done(null, user);
       else
-        done(null, false); 
+        done(null, false);
       });
   })
 );
