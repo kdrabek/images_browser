@@ -25,8 +25,8 @@ export default class Login extends React.Component {
     .set('Accept', 'application/json')
     .set('Content-Type', 'application/x-www-form-urlencoded')
     .end(function(err, res){
-      console.log(res.body.token);
       localStorage.setItem("token", res.body.token);
+      localStorage.setItem("userid", res.body.user._id);
       browserHistory.push('/');
     });
   }
